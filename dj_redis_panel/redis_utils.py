@@ -496,10 +496,12 @@ class RedisPanelUtils:
                         raw_value = redis_conn.get(key)
                         size = len(raw_value) if raw_value else 0
                     elif key_type == "ReJSON-RL":
-                        raw_value = redis_conn.execute_command("JSON.GET", key, ".")
-                        if raw_value is None:
-                            raw_value = redis_conn.execute_command("JSON.GET", key, "$")
-                        size = len(raw_value) if raw_value else 0
+                        # Use MEMORY USAGE to get size without retrieving full document
+                        try:
+                            size = redis_conn.execute_command("MEMORY USAGE", key)
+                        except Exception:
+                            # Fallback to 0 if MEMORY USAGE fails
+                            size = 0
                     elif key_type == "list":
                         size = redis_conn.llen(key)
                     elif key_type == "set":
@@ -653,10 +655,12 @@ class RedisPanelUtils:
                         raw_value = redis_conn.get(key)
                         size = len(raw_value) if raw_value else 0
                     elif key_type == "ReJSON-RL":
-                        raw_value = redis_conn.execute_command("JSON.GET", key, ".")
-                        if raw_value is None:
-                            raw_value = redis_conn.execute_command("JSON.GET", key, "$")
-                        size = len(raw_value) if raw_value else 0
+                        # Use MEMORY USAGE to get size without retrieving full document
+                        try:
+                            size = redis_conn.execute_command("MEMORY USAGE", key)
+                        except Exception:
+                            # Fallback to 0 if MEMORY USAGE fails
+                            size = 0
                     elif key_type == "list":
                         size = redis_conn.llen(key)
                     elif key_type == "set":

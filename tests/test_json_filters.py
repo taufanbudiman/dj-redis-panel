@@ -53,11 +53,11 @@ class TestPrettyJsonFilter(SimpleTestCase):
         assert result == expected
 
     def test_pretty_json_with_invalid_json_string(self):
-        """Test pretty_json raises JSONDecodeError for invalid JSON string."""
+        """Test pretty_json returns invalid JSON string unchanged."""
         invalid_json = '{"name": "John", "age": 30'
+        result = pretty_json(invalid_json)
         
-        with pytest.raises(json.JSONDecodeError):
-            pretty_json(invalid_json)
+        assert result == invalid_json
 
     def test_pretty_json_with_non_serializable_type(self):
         """Test pretty_json raises TypeError for non-serializable type."""
@@ -69,9 +69,9 @@ class TestPrettyJsonFilter(SimpleTestCase):
             pretty_json(CustomObject())
 
     def test_pretty_json_with_empty_string(self):
-        """Test pretty_json raises JSONDecodeError for empty string (invalid JSON)."""
-        with pytest.raises(json.JSONDecodeError):
-            pretty_json("")
+        """Test pretty_json returns empty string unchanged (invalid JSON)."""
+        result = pretty_json("")
+        assert result == ""
 
     def test_pretty_json_with_empty_dict(self):
         """Test pretty_json with empty dict."""
