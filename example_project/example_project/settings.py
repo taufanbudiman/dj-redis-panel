@@ -275,7 +275,7 @@ dj_redis_panel_settings_using_docker = {
     },
 }
 
-DJ_REDIS_PANEL_SETTINGS = dj_redis_panel_settings_without_docker
+DJ_REDIS_PANEL_SETTINGS = dj_redis_panel_settings_using_docker
 
 
 # Simple Console Logging Configuration
