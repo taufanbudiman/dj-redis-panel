@@ -8,30 +8,20 @@ register = template.Library()
 def pretty_json(value):
     """
     Format a JSON string with proper indentation for display.
-    
+
     Args:
         value: JSON string to format
-        
+
     Returns:
-        Pretty-printed JSON string with 2-space indentation,
-        or original value if not valid JSON
+        Pretty-printed JSON string with 2-space indentation.
+
+    Raises:
+        json.JSONDecodeError: If value is a string but not valid JSON.
+        TypeError: If value is not a JSON-serializable type.
     """
-    if value is None:
-        return value
-    
-    try:
-        # Try to parse as JSON string
-        if isinstance(value, str):
-            parsed = json.loads(value)
-            return json.dumps(parsed, indent=2, ensure_ascii=False)
-        # If already a dict/list, just dump it
-        elif isinstance(value, (dict, list)):
-            return json.dumps(value, indent=2, ensure_ascii=False)
-        # Serialize native JSON primitives (bool, int, float)
-        elif isinstance(value, (bool, int, float)):
-            return json.dumps(value, indent=2, ensure_ascii=False)
-        else:
-            return value
-    except (json.JSONDecodeError, TypeError):
-        # If not valid JSON, return as-is
-        return value
+    # Parse JSON string first, then dump with indentation
+    if isinstance(value, str):
+        parsed = json.loads(value)
+        return json.dumps(parsed, indent=2, ensure_ascii=False)
+    # For other JSON-serializable types, dump directly
+    return json.dumps(value, indent=2, ensure_ascii=False)

@@ -67,7 +67,7 @@
   <div class="dcr-dl__row">
     <dt class="dcr-dl__label">{% trans "Size" %}</dt>
     <dd class="dcr-dl__value">
-      {% if key_data.type == "string" %}
+      {% if key_data.type == "string" or key_data.type == "ReJSON-RL" %}
       {{ key_data.size }} {% trans "bytes" %}
       {% else %}
       {{ key_data.size }} {% trans "elements" %}
