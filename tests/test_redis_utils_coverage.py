@@ -728,8 +728,12 @@ class TestPaginatedScanBranches(RedisTestCase):
         self.assertEqual(result["keys_with_details"], [])
 
     def test_cursor_paginated_scan_includes_hash_type_size(self):
+        # A single SCAN call's COUNT is only a hint on how many hash-table
+        # buckets to visit, not a guarantee of finding a specific key, so
+        # per_page must be large enough to cover the whole (small) test
+        # keyspace in one pass for this assertion to be deterministic.
         result = RedisPanelUtils.cursor_paginated_scan(
-            "test_redis", 15, pattern="test:hash", per_page=10
+            "test_redis", 15, pattern="test:hash", per_page=1000
         )
         hash_entries = [k for k in result["keys_with_details"] if k["key"] == "test:hash"]
         self.assertEqual(len(hash_entries), 1)
@@ -740,7 +744,7 @@ class TestPaginatedScanBranches(RedisTestCase):
             "test_redis",
             15,
             pattern="test:*",
-            per_page=50,
+            per_page=1000,
         )
         types_seen = {k["type"] for k in result["keys_with_details"]}
         self.assertIn("list", types_seen)
@@ -763,7 +767,7 @@ class TestPaginatedScanBranches(RedisTestCase):
             redis.Redis, "execute_command", new=fake_execute_command
         ):
             result = RedisPanelUtils.cursor_paginated_scan(
-                "test_redis", 15, pattern="test:cursor_scan_rejson", per_page=10
+                "test_redis", 15, pattern="test:cursor_scan_rejson", per_page=1000
             )
 
         entries = [
@@ -777,7 +781,7 @@ class TestPaginatedScanBranches(RedisTestCase):
     def test_cursor_paginated_scan_includes_stream_type_with_zero_size(self):
         self.redis_conn.xadd("test:cursor_stream", {"field": "value"})
         result = RedisPanelUtils.cursor_paginated_scan(
-            "test_redis", 15, pattern="test:cursor_stream", per_page=10
+            "test_redis", 15, pattern="test:cursor_stream", per_page=1000
         )
         entries = [
             k for k in result["keys_with_details"] if k["key"] == "test:cursor_stream"
@@ -796,7 +800,7 @@ class TestPaginatedScanBranches(RedisTestCase):
             mock_get_decoder.return_value = mock_decoder
 
             result = RedisPanelUtils.cursor_paginated_scan(
-                "test_redis", 15, pattern="cursor:skip:me"
+                "test_redis", 15, pattern="cursor:skip:me", per_page=1000
             )
 
         self.assertEqual(result["keys_with_details"], [])
